@@ -329,13 +329,15 @@ const NarrativeEngine: React.FC = () => {
             </div>
           </div>
 
-          <div className="space-y-8 bg-slate-900/20 p-6 rounded-3xl border border-slate-800/50">
+          <div className="space-y-6 bg-slate-900/20 p-6 rounded-3xl border border-slate-800/50 relative overflow-hidden group/log">
             <div className="flex items-center gap-2 text-[10px] mono text-slate-500 font-bold uppercase tracking-widest">
               <Info className="w-4 h-4" /> Situation_Log
             </div>
-            <p className="text-xl text-slate-200 font-medium leading-relaxed">
-              {scenario.narrative}
-            </p>
+            <div className="max-h-48 overflow-y-auto pr-4 custom-scrollbar scroll-fade">
+              <p className="text-xl text-slate-200 font-medium leading-relaxed">
+                {scenario.narrative}
+              </p>
+            </div>
             <div className="pt-4 border-t border-slate-800/50">
               <h3 className="mono text-amber-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-2 mb-3">
                 <Target className="w-4 h-4" /> Neural_Decision_Node

@@ -35,7 +35,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onShowTutorial, onShowHelpBo
     <aside className="w-full h-full flex flex-col bg-slate-900/95 md:bg-slate-900/50 border-r border-slate-800/50 backdrop-blur-xl p-6 select-none overflow-y-auto relative no-print custom-scrollbar">
       {/* Mobile Close Button */}
       {onClose && (
-        <button 
+        <button
           onClick={onClose}
           className="md:hidden absolute top-4 right-4 p-2 bg-slate-800 hover:bg-slate-700 rounded-full text-slate-400 hover:text-white transition-all"
         >
@@ -58,14 +58,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onShowTutorial, onShowHelpBo
 
       <div className="space-y-6 flex-1">
         <div className="flex flex-col gap-2">
-          <button 
+          <button
             onClick={onShowTutorial}
             className="w-full flex items-center gap-3 p-3 bg-slate-800/40 border border-slate-700/50 rounded-xl text-slate-400 hover:text-emerald-400 hover:border-emerald-500/30 transition-all text-[10px] mono font-bold uppercase tracking-widest"
           >
             <HelpCircle className="w-4 h-4" /> Operations_Guide
           </button>
-          
-          <button 
+
+          <button
             onClick={onShowHelpBook}
             className="w-full flex items-center gap-3 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/40 transition-all text-[10px] mono font-bold uppercase tracking-widest"
           >
@@ -75,7 +75,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onShowTutorial, onShowHelpBo
 
         {/* Timeline Map - Fully Unlocked */}
         <section className="pt-2">
-           <div className="flex items-center gap-2 mb-3 text-slate-500">
+          <div className="flex items-center gap-2 mb-3 text-slate-500">
             <Map className="w-3.5 h-3.5" />
             <h3 className="mono text-[9px] uppercase font-bold tracking-widest">Timeline_Navigator</h3>
           </div>
@@ -83,7 +83,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onShowTutorial, onShowHelpBo
             {SCENARIOS.map((s, idx) => {
               const isResolved = history.some(h => h.levelId === s.id);
               return (
-                <button 
+                <button
                   key={s.id}
                   onClick={() => setCurrentLevel(idx)}
                   className={`h-8 rounded-lg flex items-center justify-center transition-all mono text-[10px] font-black relative
@@ -106,10 +106,12 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onShowTutorial, onShowHelpBo
             <h3 className="mono text-[9px] uppercase font-bold tracking-widest">Current_Node</h3>
           </div>
           <div className="bg-slate-950/60 p-4 rounded-xl border border-slate-800/50">
-            <div className="text-2xl mono font-black text-slate-100 tracking-tighter">{scenario.year}</div>
+            <div className="text-2xl mono font-black text-slate-100 tracking-tighter">
+              {currentLevel >= 6 ? '2150 CE' : scenario.year}
+            </div>
             <div className="text-[8px] text-emerald-500/60 mono mt-1 flex items-center gap-1 font-bold">
               <div className="w-1 h-1 bg-emerald-500 rounded-full animate-ping" />
-              OS_SYNC: NOMINAL
+              {currentLevel >= 6 ? 'MISSION_ACCOMPLISHED' : 'OS_SYNC: NOMINAL'}
             </div>
           </div>
         </section>
@@ -141,20 +143,31 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onShowTutorial, onShowHelpBo
             <History className="w-3.5 h-3.5" />
             <h3 className="mono text-[9px] uppercase font-bold tracking-widest">Archival_Log</h3>
           </div>
-          <div className="space-y-2 overflow-y-auto max-h-32 pr-2 custom-scrollbar">
+          <div className="space-y-4 overflow-y-auto max-h-48 pr-2 custom-scrollbar">
             {history.length === 0 ? (
               <div className="text-[9px] mono text-slate-700 italic p-3">Awaiting logs...</div>
             ) : (
-              history.slice().reverse().map((decision, idx) => {
-                const log = getDecisionLog(decision);
-                if (!log) return null;
+              // Group by levelId to show history of attempts
+              [...new Set(history.map(h => h.levelId))].reverse().map(levelId => {
+                const nodeHistory = history.filter(h => h.levelId === levelId);
+                const scenario = SCENARIOS.find(s => s.id === levelId);
+                if (!scenario) return null;
+
                 return (
-                  <div key={idx} className="p-2 bg-slate-900/40 rounded-lg border border-slate-800/50 flex flex-col gap-1">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[7px] mono text-slate-500 font-bold">{log.year}</span>
-                      {log.type === 'correct' ? <CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" /> : <AlertCircle className="w-2.5 h-2.5 text-red-500" />}
-                    </div>
-                    <div className="text-[9px] text-slate-400 mono leading-tight truncate">{log.choiceLabel}</div>
+                  <div key={levelId} className="space-y-1">
+                    <div className="text-[7px] mono text-slate-600 font-bold ml-1 uppercase">{scenario.year}</div>
+                    {nodeHistory.slice().reverse().map((decision, idx) => {
+                      const log = getDecisionLog(decision);
+                      if (!log) return null;
+                      return (
+                        <div key={idx} className="p-2 bg-slate-900/40 rounded-lg border border-slate-800/30 flex flex-col gap-1 transition-all">
+                          <div className="flex items-center justify-between">
+                            <div className="text-[9px] text-slate-400 mono leading-tight truncate max-w-[80%]">{log.choiceLabel}</div>
+                            {log.type === 'correct' ? <CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" /> : <AlertCircle className="w-2.5 h-2.5 text-red-500" />}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 );
               })
@@ -165,7 +178,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onShowTutorial, onShowHelpBo
 
       {/* Footer */}
       <div className="mt-auto pt-4 border-t border-slate-800/30">
-        <button 
+        <button
           onClick={handleReset}
           className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-slate-800/30 hover:bg-red-500/10 text-slate-600 hover:text-red-400 border border-slate-700/30 transition-all group"
         >

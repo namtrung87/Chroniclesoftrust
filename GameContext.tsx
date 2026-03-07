@@ -18,7 +18,7 @@ const STORAGE_KEY = 'ethical_archivist_v2_storage';
 
 const initialState: GameState = {
   currentLevel: 0,
-  balance: { eco: 100, soc: 0, env: 0 },
+  balance: { eco: 100, soc: 0, env: 20 },
   collectedShards: [],
   history: [],
   isGlitching: false,
@@ -45,7 +45,7 @@ const playEthicalSound = (type: 'transition' | 'error' | 'success') => {
     gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
     osc.start();
     osc.stop(ctx.currentTime + 0.3);
-  } catch (e) {}
+  } catch (e) { }
 };
 
 const GameContext = createContext<GameContextType | undefined>(undefined);

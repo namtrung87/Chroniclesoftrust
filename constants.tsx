@@ -78,7 +78,7 @@ export const SCENARIOS: Scenario[] = [
         label: "Return the silver to the Law.",
         type: "correct",
         reward: "The Brick of Character",
-        statImpact: { soc: 25 },
+        statImpact: { soc: 25, env: 10 },
         feedback: "Integrity is absolute.",
         ethicalInsight: "DEONTOLOGY (KANTIAN ETHICS): You acted on a 'Categorical Imperative'—do only what you would want to become universal law. By returning the gold to a man you despise, you proved that Fairness and the Law are 'Blind.' This is the foundation of 'Tone at the Top'—ethical leadership starts with rigid adherence to standards."
       },
@@ -122,7 +122,7 @@ export const SCENARIOS: Scenario[] = [
         label: "Reject and enforce the 40 days.",
         type: "correct",
         reward: "The Scroll of Justice",
-        statImpact: { soc: 20, eco: 10 },
+        statImpact: { soc: 20, eco: 10, env: 10 },
         feedback: "Guardian of the Standard.",
         ethicalInsight: "UNIVERSALISM: You applied a high ethical standard globally. By rejecting the bribe (UK Bribery Act principle), you protected the 'Credibility' of the port. You proved that your 'Integrity' cannot be bought, ensuring that future merchants can trust that certificates from this port are truly safe."
       },
@@ -166,7 +166,7 @@ export const SCENARIOS: Scenario[] = [
         label: "Reveal the Total Loss.",
         type: "correct",
         reward: "The Seal of the Fiduciary",
-        statImpact: { soc: 20, eco: -10 },
+        statImpact: { soc: 20, eco: -10, env: 10 },
         feedback: "The Painful Truth.",
         ethicalInsight: "IMA RESOLUTION PATH: You followed the ethical path of disclosure. By upholding 'Credibility' and 'Integrity,' you saved the profession. You prioritized the 'Duty of Care'—the required carefulness of a professional—proving that public trust is more valuable than any single firm's survival."
       },
@@ -197,7 +197,7 @@ export const SCENARIOS: Scenario[] = [
       trust: "Transparency / Audit",
       gap: "Algorithmic Drift."
     },
-    choices: [] 
+    choices: []
   },
   {
     id: 5,
