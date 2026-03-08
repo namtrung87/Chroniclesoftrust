@@ -231,12 +231,21 @@ export const SHARD_ICONS: Record<string, React.ReactNode> = {
   "The Apex of Stewardship": <img src="/assets/shards/stewardship.png" className="w-12 h-12 object-contain hover:scale-110 transition-transform" />
 };
 
-export const LEVEL_ICONS: Record<string, React.ElementType> = {
-  Flame: Flame,
-  Landmark: Landmark,
-  Ship: Ship,
-  Scroll: Scroll,
-  Building2: Building2,
-  Cpu: Cpu,
-  Sparkles: Sparkles
+export const ERA_BACKGROUNDS: Record<number, string> = {
+  0: "/assets/backgrounds/era_0.png",
+  1: "/assets/backgrounds/era_1.png",
+  2: "/assets/backgrounds/era_2.png",
+  3: "/assets/backgrounds/era_3.png",
+  4: "/assets/backgrounds/era_4.png",
+  5: "/assets/backgrounds/era_5.png"
+};
+
+export const LEVEL_ICONS: Record<string, React.ReactNode> = {
+  Flame: <img src="/assets/icons/flame_3d.png" className="w-6 h-6 object-contain" />,
+  Landmark: <img src="/assets/icons/landmark_3d.png" className="w-6 h-6 object-contain" />,
+  Ship: <img src="/assets/icons/ship_3d.png" className="w-6 h-6 object-contain" />,
+  Scroll: <img src="/assets/icons/scroll_3d.png" className="w-6 h-6 object-contain" />,
+  Building2: <img src="/assets/icons/factory_3d.png" className="w-6 h-6 object-contain" />,
+  Cpu: <Cpu className="w-6 h-6 text-blue-400" />,
+  Sparkles: <Sparkles className="w-6 h-6 text-emerald-400" />
 };

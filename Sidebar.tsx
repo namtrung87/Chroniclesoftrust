@@ -2,7 +2,7 @@
 import React from 'react';
 import { User, Activity, Clock, Box, RotateCcw, History, CheckCircle2, AlertCircle, HelpCircle, BookOpen, X, Map } from 'lucide-react';
 import { useGame } from './GameContext';
-import { SCENARIOS } from './constants';
+import { SCENARIOS, LEVEL_ICONS } from './constants';
 import BalanceBars from './components/BalanceBars';
 import ShardRepository from './components/ShardRepository';
 
@@ -82,16 +82,19 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose, onShowTutorial, onShowHelpBo
           <div className="grid grid-cols-6 gap-1 bg-slate-950/40 p-2 rounded-xl border border-slate-800/50">
             {SCENARIOS.map((s, idx) => {
               const isResolved = history.some(h => h.levelId === s.id);
+              const iconNode = LEVEL_ICONS[s.icon];
               return (
                 <button
                   key={s.id}
                   onClick={() => setCurrentLevel(idx)}
-                  className={`h-8 rounded-lg flex items-center justify-center transition-all mono text-[10px] font-black relative
-                    ${currentLevel === idx ? 'bg-emerald-500 text-slate-950 scale-110 shadow-lg' : 'bg-slate-900 text-slate-500 hover:bg-slate-800 hover:text-slate-300'}`}
+                  className={`h-10 rounded-lg flex items-center justify-center transition-all mono text-[10px] font-black relative overflow-hidden group/item
+                    ${currentLevel === idx ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.2)]' : 'bg-slate-900/60 text-slate-600 border border-slate-800 hover:border-slate-700'}`}
                   title={`${s.title} (${s.year})`}
                 >
-                  {idx}
-                  {isResolved && <div className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-500 rounded-full border border-slate-900" />}
+                  <div className={`transition-transform duration-500 ${currentLevel === idx ? 'scale-110' : 'scale-75 opacity-50'}`}>
+                    {iconNode}
+                  </div>
+                  {isResolved && <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-emerald-500 rounded-full shadow-[0_0_5px_rgba(16,185,129,1)]" />}
                 </button>
               );
             })}
