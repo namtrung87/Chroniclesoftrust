@@ -13,6 +13,36 @@
         :root {
             --emerald-glow: rgba(16, 185, 129, 0.4);
             --slate-bg: #020617;
+            
+            /* Era Specific Tokens */
+            --era-accent: 16, 185, 129; /* Emerald default */
+            --era-background: 2, 6, 23;
+            --era-text: 241, 245, 249;
+            --era-border: rgba(16, 185, 129, 0.1);
+        }
+
+        /* Era Skins */
+        .era-0 { /* 10,000 BCE - Primal */
+            --era-accent: 249, 115, 22; /* Orange/Fire */
+            --era-border: rgba(249, 115, 22, 0.2);
+            --era-background: 12, 10, 9;
+        }
+
+        .era-1 { /* 300 BCE - Civics */
+            --era-accent: 234, 179, 8; /* Gold/Marble */
+            --era-border: rgba(234, 179, 8, 0.2);
+            --era-background: 15, 23, 42;
+        }
+
+        .era-2 { /* 1720 CE - Trade */
+            --era-accent: 14, 165, 233; /* Ocean Blue */
+            --era-border: rgba(14, 165, 233, 0.2);
+        }
+
+        .era-5 { /* 2150 CE - Future */
+            --era-accent: 45, 212, 191; /* Teal/Matrix */
+            --era-border: rgba(45, 212, 191, 0.3);
+            --era-background: 2, 6, 23;
         }
 
         body {
@@ -75,9 +105,24 @@
 
         /* Glassmorphism utility */
         .glass {
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(var(--era-background), 0.6);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--era-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* Dynamic Glows */
+        .glow-accent {
+            box-shadow: 0 0 20px rgba(var(--era-accent), 0.2);
+            border-color: rgba(var(--era-accent), 0.4);
+        }
+        
+        .text-accent {
+            color: rgb(var(--era-accent));
+        }
+        
+        .bg-accent {
+            background-color: rgb(var(--era-accent));
         }
 
         /* Custom scrollbar */

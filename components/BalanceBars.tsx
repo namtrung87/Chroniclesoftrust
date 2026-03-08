@@ -7,9 +7,9 @@ const BalanceBars: React.FC = () => {
   const { balance } = useGame();
 
   const metrics = [
-    { label: 'ECO', value: balance.eco, color: 'bg-emerald-500', shadow: 'shadow-emerald-500/40', glow: 'emerald' },
-    { label: 'SOC', value: balance.soc, color: 'bg-blue-500', shadow: 'shadow-blue-500/40', glow: 'blue' },
-    { label: 'ENV', value: balance.env, color: 'bg-teal-400', shadow: 'shadow-teal-400/40', glow: 'teal' },
+    { label: 'ECO', value: balance.eco, color: 'from-emerald-600 to-emerald-400', shadow: 'shadow-emerald-500/40', glow: 'emerald' },
+    { label: 'SOC', value: balance.soc, color: 'from-blue-600 to-blue-400', shadow: 'shadow-blue-500/40', glow: 'blue' },
+    { label: 'ENV', value: balance.env, color: 'from-teal-500 to-teal-300', shadow: 'shadow-teal-400/40', glow: 'teal' },
   ];
 
   return (
@@ -19,17 +19,17 @@ const BalanceBars: React.FC = () => {
         return (
           <div key={m.label} className="flex flex-col items-center h-full w-full group">
             <div className="relative flex-1 w-5 bg-slate-900/80 rounded-full overflow-hidden flex flex-col justify-end border border-slate-800">
-               {isLow && (
-                 <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 animate-pulse">
-                   <AlertTriangle className="w-3 h-3 text-red-500" />
-                 </div>
-               )}
-               <div 
-                 className={`w-full transition-all duration-1000 ease-out ${isLow ? 'bg-red-500 shadow-red-500/50' : m.color} ${m.shadow} shadow-[0_0_15px_rgba(0,0,0,0.5)]`} 
-                 style={{ height: `${m.value}%` }} 
-               />
-               {/* Internal Glow */}
-               <div className={`absolute inset-0 opacity-20 pointer-events-none ${isLow ? 'bg-red-500' : m.color}`} />
+              {isLow && (
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 animate-pulse">
+                  <AlertTriangle className="w-3 h-3 text-red-500" />
+                </div>
+              )}
+              <div
+                className={`w-full bg-gradient-to-t transition-all duration-1000 ease-out ${isLow ? 'from-red-600 to-red-400 shadow-red-500/50' : m.color} ${m.shadow} shadow-[0_0_15px_rgba(0,0,0,0.5)]`}
+                style={{ height: `${m.value}%` }}
+              />
+              {/* Internal Glow */}
+              <div className={`absolute inset-0 opacity-20 pointer-events-none ${isLow ? 'bg-red-500' : m.color}`} />
             </div>
             <span className={`text-[10px] mt-2 mono font-black tracking-tighter ${isLow ? 'text-red-500 animate-pulse' : 'text-slate-500 group-hover:text-slate-300'} transition-colors`}>
               {m.label}

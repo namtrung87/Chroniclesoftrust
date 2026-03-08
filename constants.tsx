@@ -223,12 +223,12 @@ export const SCENARIOS: Scenario[] = [
 export const SHARD_SLOTS = 6;
 
 export const SHARD_ICONS: Record<string, React.ReactNode> = {
-  "The Spark of Reciprocity": <Sparkles className="w-8 h-8 text-emerald-400 animate-pulse" />,
-  "The Brick of Character": <UserCheck className="w-8 h-8 text-emerald-400 animate-pulse" />,
-  "The Scroll of Justice": <Scale className="w-8 h-8 text-emerald-400 animate-pulse" />,
-  "The Seal of the Fiduciary": <Gem className="w-8 h-8 text-emerald-400 animate-pulse" />,
-  "The Shield of the Whistleblower": <ShieldCheck className="w-8 h-8 text-emerald-400 animate-pulse" />,
-  "The Apex of Stewardship": <Award className="w-8 h-8 text-emerald-400 animate-pulse" />
+  "The Spark of Reciprocity": <img src="/assets/shards/reciprocity.png" className="w-12 h-12 object-contain hover:scale-110 transition-transform" />,
+  "The Brick of Character": <img src="/assets/shards/character.png" className="w-12 h-12 object-contain hover:scale-110 transition-transform" />,
+  "The Scroll of Justice": <img src="/assets/shards/justice.png" className="w-12 h-12 object-contain hover:scale-110 transition-transform" />,
+  "The Seal of the Fiduciary": <img src="/assets/shards/fiduciary.png" className="w-12 h-12 object-contain hover:scale-110 transition-transform" />,
+  "The Shield of the Whistleblower": <img src="/assets/shards/whistleblower.png" className="w-12 h-12 object-contain hover:scale-110 transition-transform" />,
+  "The Apex of Stewardship": <img src="/assets/shards/stewardship.png" className="w-12 h-12 object-contain hover:scale-110 transition-transform" />
 };
 
 export const LEVEL_ICONS: Record<string, React.ElementType> = {
