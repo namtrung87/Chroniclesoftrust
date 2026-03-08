@@ -249,3 +249,17 @@ export const LEVEL_ICONS: Record<string, React.ReactNode> = {
   Cpu: <Cpu className="w-6 h-6 text-blue-400" />,
   Sparkles: <Sparkles className="w-6 h-6 text-emerald-400" />
 };
+export const CHARACTER_PORTRAITS: Record<number, string> = {
+  0: "/assets/characters/primal.png",
+  1: "/assets/characters/jurist.png",
+  2: "/assets/characters/overseer.png",
+  3: "/assets/characters/accountant.png",
+  4: "/assets/characters/auditor.png",
+  5: "/assets/characters/supreme.png"
+};
+
+export const UI_RESULT_ASSETS: Record<string, string> = {
+  success: "/assets/ui/results/success.png",
+  failure: "/assets/ui/results/failure.png",
+  nuanced: "/assets/ui/results/nuanced.png"
+};
