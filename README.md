@@ -13,6 +13,9 @@ View your app in AI Studio: https://ai.studio/apps/drive/1lsFOCGAjfD-zkPozAsmrbv
 **Prerequisites:**  Node.js
 
 
+## Visual Enhancement
+This version includes high-fidelity 3D assets, cinematic era backgrounds, and era-specific character portraits for an immersive ethical auditing experience.
+
 1. Install dependencies:
    `npm install`
 2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
