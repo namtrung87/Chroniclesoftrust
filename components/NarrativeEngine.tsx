@@ -22,7 +22,11 @@ const NarrativeEngine: React.FC = () => {
   const [showBriefingConfirm, setShowBriefingConfirm] = useState(false);
 
   const scenario = SCENARIOS[currentLevel];
-  const IconComponent = scenario ? (LEVEL_ICONS[scenario.icon] || ShieldAlert) : ShieldAlert;
+  const iconNode = scenario && LEVEL_ICONS[scenario.icon] ? (
+    LEVEL_ICONS[scenario.icon]
+  ) : (
+    <ShieldAlert className="w-6 h-6 text-emerald-400" />
+  );
 
   useEffect(() => {
     const initLevel = async () => {
@@ -236,7 +240,7 @@ const NarrativeEngine: React.FC = () => {
     <div className="flex flex-col h-full animate-in fade-in duration-500 overflow-hidden">
       <header className="flex items-center gap-6 border-b border-slate-800/50 pb-4 shrink-0">
         <div className="p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
-          <IconComponent className="w-6 h-6 text-emerald-400" />
+          {iconNode}
         </div>
         <div className="flex-1">
           <h1 className="text-2xl font-black text-white uppercase tracking-tight">{scenario?.title}</h1>
@@ -293,7 +297,7 @@ const NarrativeEngine: React.FC = () => {
     <div className="relative h-full flex flex-col space-y-6 animate-in fade-in duration-500">
       <header className="flex items-center gap-6 border-b border-slate-800/50 pb-4">
         <div className="p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
-          <IconComponent size={24} className="text-emerald-400" />
+          {iconNode}
         </div>
         <div className="flex-1">
           <h1 className="text-2xl font-black text-white uppercase tracking-tight">{scenario.title}</h1>
