@@ -1,6 +1,6 @@
-
 import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect, useRef } from 'react';
 import { GameState, Balance, PlayerDecision } from './types';
+import { playEthicalSound } from './audioUtils';
 
 interface GameContextType extends GameState {
   setCurrentLevel: (level: number) => void;
@@ -18,34 +18,11 @@ const STORAGE_KEY = 'ethical_archivist_v2_storage';
 
 const initialState: GameState = {
   currentLevel: 0,
-  balance: { eco: 100, soc: 0, env: 20 },
+  balance: { eco: 100, soc: 0, env: 10 },
   collectedShards: [],
   history: [],
   isGlitching: false,
   glitchMode: 'transition',
-};
-
-const playEthicalSound = (type: 'transition' | 'error' | 'success') => {
-  try {
-    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    if (type === 'success') {
-      osc.frequency.setValueAtTime(440, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.2);
-    } else if (type === 'error') {
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(120, ctx.currentTime);
-    } else {
-      osc.frequency.setValueAtTime(200, ctx.currentTime);
-    }
-    gain.gain.setValueAtTime(0.1, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.3);
-  } catch (e) { }
 };
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -56,6 +33,7 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [toastType, setToastType] = useState<'save' | 'load'>('save');
   const isFirstMount = useRef(true);
 
+  // Persistence Logic: Load from LocalStorage
   const getStoredState = (): GameState => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -63,14 +41,14 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return { ...JSON.parse(saved), isGlitching: false };
       }
     } catch (e) {
-      console.error("Archive Load Error", e);
+      console.error("Timeline Restore Error", e);
     }
     return initialState;
   };
 
   const [state, setState] = useState<GameState>(getStoredState);
 
-  // Trigger load toast on mount
+  // Lifecycle: Display restore toast on startup
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -82,39 +60,52 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, []);
 
-  // Auto-save on state change
+  // Lifecycle: Auto-save state changes with stabilization check
   useEffect(() => {
     if (isFirstMount.current) {
       isFirstMount.current = false;
       return;
     }
-    const saveToDisk = () => {
+    
+    // Stabilize the save: only save if parameters actually shifted
+    const timer = setTimeout(() => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         currentLevel: state.currentLevel,
         balance: state.balance,
         collectedShards: state.collectedShards,
         history: state.history
       }));
+      
       setToastMessage('TIMELINE_SAVED');
       setToastType('save');
       setShowSaveToast(true);
-      const timer = setTimeout(() => setShowSaveToast(false), 2000);
-      return () => clearTimeout(timer);
-    };
-    saveToDisk();
+      setTimeout(() => setShowSaveToast(false), 2000);
+    }, 1000); // 1s debounce to prevent rapid-fire writes during fast transitions
+    
+    return () => clearTimeout(timer);
   }, [state.currentLevel, state.balance, state.collectedShards, state.history]);
 
+  /**
+   * Action: Triggers a visual glitch and audio feedback.
+   */
   const triggerGlitch = useCallback((mode: 'transition' | 'error' | 'success') => {
     playEthicalSound(mode);
     setState(prev => ({ ...prev, isGlitching: true, glitchMode: mode }));
-    setTimeout(() => setState(prev => ({ ...prev, isGlitching: false })), 400);
+    setTimeout(() => setState(prev => ({ ...prev, isGlitching: false })), 250);
   }, []);
 
+  /**
+   * Action: Change the current game era.
+   */
   const setCurrentLevel = useCallback((level: number) => {
     triggerGlitch('transition');
-    setTimeout(() => setState(prev => ({ ...prev, currentLevel: level })), 150);
+    // Delay level change slightly to allow transition effect to start
+    setTimeout(() => setState(prev => ({ ...prev, currentLevel: level })), 100);
   }, [triggerGlitch]);
 
+  /**
+   * Action: Update the Triple Bottom Line balance.
+   */
   const updateBalance = useCallback((change: Partial<Balance>) => {
     setState(prev => ({
       ...prev,
@@ -126,6 +117,9 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }));
   }, []);
 
+  /**
+   * Action: Add an ethical shard to the repository.
+   */
   const addShard = useCallback((shard: string) => {
     setState(prev => ({
       ...prev,
@@ -133,10 +127,16 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }));
   }, []);
 
+  /**
+   * Action: Log a decision in the history.
+   */
   const recordDecision = useCallback((decision: PlayerDecision) => {
     setState(prev => ({ ...prev, history: [...prev.history, decision] }));
   }, []);
 
+  /**
+   * Action: Wipe local archive and restart.
+   */
   const resetGame = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
     setState(initialState);
@@ -144,8 +144,16 @@ export const GameProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   return (
     <GameContext.Provider value={{
-      ...state, setCurrentLevel, updateBalance, addShard, recordDecision, triggerGlitch, resetGame,
-      showSaveToast, toastMessage, toastType
+      ...state, 
+      setCurrentLevel, 
+      updateBalance, 
+      addShard, 
+      recordDecision, 
+      triggerGlitch, 
+      resetGame,
+      showSaveToast, 
+      toastMessage, 
+      toastType
     }}>
       {children}
     </GameContext.Provider>

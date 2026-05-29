@@ -13,6 +13,11 @@ const ArchiveCertificate: React.FC = () => {
 
   useEffect(() => {
     const generateAscensionVisual = async () => {
+      const apiKey = import.meta.env.VITE_AI_API_KEY;
+      if (!apiKey || apiKey === 'PLACEHOLDER_API_KEY') {
+        setIsGenerating(false);
+        return;
+      }
       setIsGenerating(true);
       let success = false;
       let retries = 0;
@@ -20,7 +25,7 @@ const ArchiveCertificate: React.FC = () => {
 
       while (!success && retries <= maxRetries) {
         try {
-          const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+          const ai = new GoogleGenAI(apiKey);
           const prompt = "A futuristic masterwork of the Archivist standing at the center of a repaired timeline, cosmic energy flowing into a balanced triad of human city, nature, and machine light. Hyper-detailed cinematic art.";
           const response = await ai.models.generateContent({
             model: 'gemini-3-flash-preview',

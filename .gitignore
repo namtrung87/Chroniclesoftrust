@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Backups and temporary files
+node_modules_OLD
+node_modules_corrupt_OLD
+tmp_check_config.js
+

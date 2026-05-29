@@ -57,7 +57,8 @@ const NarrativeEngine: React.FC = () => {
   }, [currentLevel]);
 
   const generateEraVisual = async () => {
-    if (isGeneratingImage || !scenario || !process.env.API_KEY) return;
+    const apiKey = import.meta.env.VITE_AI_API_KEY;
+    if (isGeneratingImage || !scenario || !apiKey || apiKey === 'PLACEHOLDER_API_KEY') return;
     setIsGeneratingImage(true);
 
     let success = false;
@@ -66,12 +67,17 @@ const NarrativeEngine: React.FC = () => {
 
     while (!success && retries <= maxRetries) {
       try {
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-        const promptText = `Cinematic historical masterwork: ${scenario.year}, ${scenario.title}. Wide angle, dramatic lighting, atmospheric emerald glow, high detail, masterpiece art style.`;
+        const ai = new GoogleGenAI(apiKey);
+        const promptText = `URGENT ARCHIVE VISUAL: Cinematic historical masterwork for ${scenario.year}, ${scenario.title}. Art style: Ultra-high fidelity, Unreal Engine 5 render, dramatic volumetric lighting, vibrant emerald highlights, atmospheric depth, 8k resolution, AAA game concept art.`;
         const response = await ai.models.generateContent({
-          model: 'gemini-3-flash-preview',
-          contents: { parts: [{ text: promptText }] },
-          config: { imageConfig: { aspectRatio: "16:9" } }
+          model: 'gemini-1.5-flash-latest',
+          contents: [{ parts: [{ text: promptText }] }],
+          generationConfig: { 
+            responseMimeType: "application/json",
+            // Since we want an image, we need to be careful with the API usage here.
+            // If the user's provider supports image generation via text, we use it.
+            // Based on the previous code, it expects inlineData (base64).
+          }
         });
 
         const candidate = response.candidates?.[0];
@@ -100,13 +106,14 @@ const NarrativeEngine: React.FC = () => {
 
   const nextLevel = () => {
     setIsClosing(true);
+    setIsLevelLoading(true); // Show loading immediately for the next level
     setTimeout(() => {
       setModalType('none');
       setActiveChoice(null);
       setLastClickedId(null);
       setCurrentLevel(currentLevel + 1);
       setIsClosing(false);
-    }, 500);
+    }, 400); // Slightly faster
   };
 
   const handleRechoose = () => {
@@ -143,67 +150,70 @@ const NarrativeEngine: React.FC = () => {
     return (
       <div className="absolute inset-0 z-[100] flex flex-col items-center justify-center bg-slate-950 overflow-hidden">
         {currentImageUrl && (
-          <div className="absolute inset-0 opacity-20 blur-2xl scale-110">
+          <div className="absolute inset-0 opacity-30 blur-3xl scale-125 transition-transform duration-[20s]">
             <img src={currentImageUrl} alt="Historical Node Background" className="w-full h-full object-cover" />
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/80 to-slate-950" />
-        <div className="relative z-10 w-full max-w-5xl px-6 md:px-12 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <div className="flex flex-col items-center gap-6">
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/20 via-slate-950/60 to-slate-950" />
+        
+        {/* Loading Content Portal */}
+        <div className="relative z-10 w-full max-w-5xl px-6 md:px-12 space-y-12 animate-in fade-in zoom-in-95 duration-1000">
+          <div className="flex flex-col items-center gap-8">
             <div className="relative">
-              <div className="absolute inset-0 bg-emerald-500/20 blur-2xl rounded-full animate-pulse" />
-              <div className="w-20 h-20 rounded-2xl bg-slate-900 border border-emerald-500/30 flex items-center justify-center relative z-10 group">
-                <Clock className="w-10 h-10 text-emerald-500 group-hover:scale-110 transition-transform" />
+              <div className="absolute inset-[-20px] bg-emerald-500/10 blur-[60px] rounded-full animate-pulse" />
+              <div className="w-24 h-24 rounded-[2rem] bg-slate-900/80 border border-emerald-500/30 flex items-center justify-center relative z-10 group glass-vibrant glow-accent">
+                <Clock className="w-12 h-12 text-emerald-500 group-hover:rotate-12 transition-transform duration-500" />
               </div>
             </div>
-            <div className="text-center space-y-2">
-              <div className="mono text-[10px] text-emerald-500/60 uppercase tracking-[0.5em] font-black">Temporal_Synchronization</div>
-              <h2 className="text-4xl font-black text-white uppercase tracking-tight">{scenario.title}</h2>
-              <div className="flex items-center justify-center gap-3">
-                <span className="h-px w-8 bg-emerald-500/30" />
-                <span className="mono text-lg text-emerald-400 font-bold">{scenario.year}</span>
-                <span className="h-px w-8 bg-emerald-500/30" />
+            <div className="text-center space-y-4">
+              <div className="mono text-[11px] text-emerald-500 font-black uppercase tracking-[0.6em] animate-pulse">Initializing_Temporal_Link</div>
+              <h2 className="text-5xl font-black text-white uppercase tracking-tighter sm:text-6xl">{scenario.title}</h2>
+              <div className="flex items-center justify-center gap-6">
+                <span className="h-px w-12 bg-emerald-500/20" />
+                <span className="mono text-2xl text-emerald-400 font-black drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]">{scenario.year}</span>
+                <span className="h-px w-12 bg-emerald-500/20" />
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-            <div className="p-6 bg-slate-900/60 border border-slate-800 rounded-3xl space-y-4 backdrop-blur-md overflow-hidden relative group">
-              <div className="flex items-center gap-3 text-emerald-500">
-                <User className="w-5 h-5" />
-                <span className="mono text-[10px] font-black uppercase tracking-widest">Archivist_Persona</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="p-8 glass-vibrant rounded-[2.5rem] space-y-5 group">
+              <div className="flex items-center gap-4 text-emerald-500">
+                <div className="p-2 bg-emerald-500/10 rounded-lg"><User className="w-4 h-4" /></div>
+                <span className="mono text-[10px] font-black uppercase tracking-[0.2em]">Archivist_Identity</span>
               </div>
-              <div className="flex gap-4 items-center">
-                <div className="w-12 h-12 rounded-xl border border-emerald-500/20 overflow-hidden bg-slate-950 shrink-0 shadow-lg">
-                  <img src={CHARACTER_PORTRAITS[currentLevel]} alt={scenario.archivistRole} className="w-full h-full object-cover opacity-80" />
+              <div className="flex gap-5 items-center">
+                <div className="w-16 h-16 rounded-2xl border border-emerald-500/30 overflow-hidden bg-slate-950 shrink-0 shadow-2xl relative">
+                  <img src={CHARACTER_PORTRAITS[currentLevel]} alt={scenario.archivistRole} className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" />
+                  <div className="absolute inset-0 bg-emerald-900/20" />
                 </div>
-                <p className="text-sm text-slate-200 leading-relaxed font-medium italic">
+                <p className="text-sm text-slate-300 leading-relaxed font-semibold italic">
                   "{scenario.archivistRole}"
                 </p>
               </div>
             </div>
 
-            <div className="p-6 bg-slate-900/60 border border-slate-800 rounded-3xl space-y-4 backdrop-blur-md md:col-span-2">
-              <div className="flex items-center gap-3 text-blue-500">
-                <GraduationCap className="w-5 h-5" />
-                <span className="mono text-[10px] font-black uppercase tracking-widest">The_Evolution_of_Trust</span>
+            <div className="p-8 glass-vibrant rounded-[2.5rem] space-y-5 md:col-span-2">
+              <div className="flex items-center gap-4 text-blue-400">
+                <div className="p-2 bg-blue-500/10 rounded-lg"><GraduationCap className="w-4 h-4" /></div>
+                <span className="mono text-[10px] font-black uppercase tracking-[0.2em]">Context_Retrieval</span>
               </div>
-              <p className="text-sm text-slate-300 leading-relaxed font-bold font-serif italic border-l-2 border-blue-500/30 pl-4">
+              <p className="text-md text-slate-200 leading-relaxed font-bold font-serif italic border-l-4 border-blue-500/40 pl-6 py-2">
                 {scenario.eraEducation}
               </p>
             </div>
           </div>
 
-          <div className="w-full space-y-4">
+          <div className="w-full space-y-6">
             {!showBriefingConfirm ? (
-              <div className="space-y-4">
-                <div className="flex justify-between mono text-[10px] text-slate-500 uppercase tracking-widest font-black">
-                  <span>Synthesizing_Neural_Link</span>
-                  <span>{Math.floor(loadingProgress)}%</span>
+              <div className="space-y-6">
+                <div className="flex justify-between mono text-[10px] text-slate-400 uppercase tracking-widest font-black">
+                  <span className="flex items-center gap-2 animate-pulse"><RefreshCw className="w-3 h-3 animate-spin-slow" /> Calibrating_Historical_Node...</span>
+                  <span className="text-emerald-500">{Math.floor(loadingProgress)}%</span>
                 </div>
-                <div className="h-1 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                <div className="h-1.5 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800/80 p-[1px]">
                   <div
-                    className="h-full bg-emerald-500 shadow-[0_0_15px_#10b981] transition-all duration-300 ease-out"
+                    className="h-full bg-gradient-to-r from-emerald-600 via-emerald-400 to-emerald-600 shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all duration-300 ease-out rounded-full"
                     style={{ width: `${loadingProgress}%` }}
                   />
                 </div>
@@ -211,9 +221,9 @@ const NarrativeEngine: React.FC = () => {
             ) : (
               <button
                 onClick={handleConfirmBriefing}
-                className="w-full py-5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-2xl font-black mono text-sm uppercase tracking-[0.4em] transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl shadow-emerald-500/20 flex items-center justify-center gap-4 animate-in zoom-in-95 duration-500"
+                className="w-full py-6 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-3xl font-black mono text-sm uppercase tracking-[0.5em] transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_20px_50px_rgba(16,185,129,0.3)] flex items-center justify-center gap-6 animate-in zoom-in-95 slide-in-from-bottom-8 duration-700"
               >
-                Establish_Neural_Link <ChevronRight className="w-5 h-5" />
+                Launch_Integration <ChevronRight className="w-6 h-6" />
               </button>
             )}
           </div>
@@ -267,7 +277,17 @@ const NarrativeEngine: React.FC = () => {
   );
   if (currentLevel === 7) return <ArchiveCertificate />;
 
-  if (!scenario) return null;
+  if (!scenario) {
+    if (currentLevel > 7) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full text-center space-y-6">
+          <h2 className="text-2xl font-black text-white uppercase">Timeline End Reached</h2>
+          <button onClick={() => setCurrentLevel(0)} className="px-8 py-3 bg-emerald-500 text-slate-950 rounded-xl font-bold">Restart Simulation</button>
+        </div>
+      );
+    }
+    return null;
+  }
 
   return (
     <div className="relative h-full flex flex-col space-y-6 animate-in fade-in duration-500">

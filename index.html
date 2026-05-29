@@ -39,6 +39,18 @@
             --era-border: rgba(14, 165, 233, 0.2);
         }
 
+        .era-3 { /* 1885 CE - Industry */
+            --era-accent: 244, 63, 94; /* Rose/Steel */
+            --era-border: rgba(244, 63, 94, 0.2);
+            --era-background: 9, 9, 11;
+        }
+
+        .era-4 { /* 2025 CE - Global */
+            --era-accent: 139, 92, 246; /* Violet/Digital */
+            --era-border: rgba(139, 92, 246, 0.3);
+            --era-background: 3, 7, 18;
+        }
+
         .era-5 { /* 2150 CE - Future */
             --era-accent: 45, 212, 191; /* Teal/Matrix */
             --era-border: rgba(45, 212, 191, 0.3);
@@ -103,78 +115,44 @@
             animation: glitch 0.4s cubic-bezier(.25, .46, .45, .94) both infinite;
         }
 
-        /* Glassmorphism utility */
-        .glass {
+        /* Portal Transition Effect */
+        @keyframes portal-in {
+            0% { transform: scale(0.8); opacity: 0; filter: blur(20px); }
+            100% { transform: scale(1.1); opacity: 1; filter: blur(0px); }
+        }
+
+        @keyframes portal-out {
+            0% { transform: scale(1.1); opacity: 1; filter: blur(0px); }
+            100% { transform: scale(1.5); opacity: 0; filter: blur(40px); }
+        }
+
+        .portal-active {
+            animation: portal-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .portal-exit {
+            animation: portal-out 0.4s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+        }
+
+        /* Enhanced SOTA Glassmorphism */
+        .glass-vibrant {
             background: rgba(var(--era-background), 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--era-border);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(var(--era-accent), 0.4);
+            box-shadow: 
+                0 12px 48px 0 rgba(0, 0, 0, 0.6),
+                inset 0 0 40px rgba(var(--era-accent), 0.1);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Dynamic Glows */
-        .glow-accent {
-            box-shadow: 0 0 20px rgba(var(--era-accent), 0.2);
-            border-color: rgba(var(--era-accent), 0.4);
-        }
-        
-        .text-accent {
-            color: rgb(var(--era-accent));
-        }
-        
-        .bg-accent {
-            background-color: rgb(var(--era-accent));
-        }
-
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 5px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.5);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(to bottom, transparent, rgba(16, 185, 129, 0.5), transparent);
-            border-radius: 10px;
-        }
-
-        /* Better Sliders */
-        input[type=range] {
-            -webkit-appearance: none;
-            background: transparent;
-        }
-
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 20px;
-            width: 20px;
-            border-radius: 50%;
-            background: currentColor;
-            cursor: pointer;
-            margin-top: -4px;
-            /* Centers thumb on the track */
-            box-shadow: 0 0 15px currentColor;
-            border: 2px solid #020617;
-            transition: all 0.2s ease;
-        }
-
-        input[type=range]::-moz-range-thumb {
-            height: 18px;
-            width: 18px;
-            border-radius: 50%;
-            background: currentColor;
-            cursor: pointer;
-            border: 2px solid #020617;
-            box-shadow: 0 0 15px currentColor;
-        }
-
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 8px;
-            cursor: pointer;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+        .glass-vibrant::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+            pointer-events: none;
         }
 
         /* Scroll Gradient Fade Utility */

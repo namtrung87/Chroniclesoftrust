@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Shield, Globe, Clock, Zap, ArrowRight, BookOpen, WifiOff } from 'lucide-react';
+import { Menu, X, Shield, Globe, Clock, Zap, ArrowRight, BookOpen, WifiOff, Music } from 'lucide-react';
 import { GameProvider, useGame } from './GameContext';
 import Sidebar from './Sidebar';
 import MainStage from './components/MainStage';
@@ -8,13 +8,26 @@ import NarrativeEngine from './components/NarrativeEngine';
 import TutorialModal from './components/TutorialModal';
 import HelpBookModal from './components/HelpBookModal';
 import { GoogleGenAI } from "@google/genai";
+import ErrorBoundary from './components/ErrorBoundary';
 import { ERA_BACKGROUNDS } from './constants';
 
+import { musicEngine } from './musicUtils';
+
 const GameContainer: React.FC = () => {
-  const { currentLevel } = useGame();
+  const { currentLevel, isGlitching, glitchMode } = useGame();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [gameStarted, setGameStarted] = useState(currentLevel > 0);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(false);
+
+  // Sync Ambient Music with Era
+  useEffect(() => {
+    if (soundEnabled && gameStarted) {
+      musicEngine.start(currentLevel);
+    } else {
+      musicEngine.stop();
+    }
+  }, [currentLevel, soundEnabled, gameStarted]);
   const [showHelpBook, setShowHelpBook] = useState(false);
   const [appBgUrl, setAppBgUrl] = useState<string | null>(null);
   const [apiQuotaExhausted, setApiQuotaExhausted] = useState(false);
@@ -22,16 +35,51 @@ const GameContainer: React.FC = () => {
 
   useEffect(() => {
     const generateAppBg = async () => {
-      // Background generation logic...
-      // (Kept as is for now)
+      const apiKey = import.meta.env.VITE_AI_API_KEY;
+      if (!apiKey || apiKey === 'PLACEHOLDER_API_KEY') return;
+      
+      try {
+        const ai = new GoogleGenAI(apiKey);
+        const model = ai.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+        const prompt = "Infinite cosmic archive of human history, ethereal emerald glowing particles, library of light, cinematic, wide angle, hyper-realistic, dark atmosphere, 8k.";
+        
+        const result = await model.generateContent({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { maxOutputTokens: 100 }
+        });
+        
+        const candidate = result.response.candidates?.[0];
+        if (candidate?.content?.parts) {
+          for (const part of candidate.content.parts) {
+            if (part.inlineData) {
+              setAppBgUrl(`data:image/png;base64,${part.inlineData.data}`);
+              break;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn("Cosmic Bg Generation Failed", e);
+        setApiQuotaExhausted(true);
+      }
     };
-    generateAppBg();
-  }, []);
+    if (gameStarted) generateAppBg();
+  }, [gameStarted]);
 
   const handleStart = () => setGameStarted(true);
 
   return (
     <main className={`relative w-full h-screen bg-slate-950 text-slate-100 overflow-hidden selection:bg-emerald-500/30 flex era-${currentLevel}`}>
+      
+      {/* Portal Transition Overlay */}
+      {isGlitching && glitchMode === 'transition' && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center pointer-events-none">
+          <div className="absolute inset-0 bg-slate-950 portal-active" />
+          <div className="relative z-10 mono text-[10px] text-emerald-500 font-black tracking-[1em] animate-pulse">
+            SYNCHRONIZING_TIME...
+          </div>
+        </div>
+      )}
+
       {/* Cinematic Era Background */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         {Object.entries(ERA_BACKGROUNDS).map(([level, src]) => (
@@ -65,7 +113,7 @@ const GameContainer: React.FC = () => {
       <div className="absolute inset-0 z-0 bg-gradient-to-tr from-emerald-500/5 to-blue-500/5" />
 
       {/* Sidebar for stats and history */}
-      <div className="w-80 h-full shrink-0 relative z-10 glass border-r">
+      <div className="w-80 h-full shrink-0 relative z-10 glass-vibrant border-r">
         <Sidebar
           onShowTutorial={() => setShowTutorial(true)}
           onShowHelpBook={() => setShowHelpBook(true)}
@@ -106,8 +154,25 @@ const GameContainer: React.FC = () => {
                       Future Outlook: Divergent
                     </div>
                   </div>
-                </div>
-              </div>
+                {/* Control Cluster */}
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              className={`p-3 rounded-xl border transition-all ${soundEnabled ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-lg shadow-emerald-500/10' : 'bg-slate-900 border-slate-800 text-slate-500'}`}
+              title={soundEnabled ? "Mute_Neural_Ambience" : "Initialize_Neural_Ambience"}
+            >
+              <Music className={`w-5 h-5 ${soundEnabled ? 'animate-pulse' : ''}`} />
+            </button>
+            
+            <button 
+              className="lg:hidden p-3 bg-slate-900 border border-slate-800 rounded-xl text-slate-400 hover:text-white transition-colors"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              <Menu size={24} />
+            </button>
+          </div>
+        </div>
+      </div>
 
               <div className="p-8 bg-slate-900/60 border border-slate-800 rounded-[2.5rem] space-y-6 text-left hover:border-emerald-500/30 transition-all">
                 <div className="flex items-center gap-3 text-emerald-500">
@@ -142,7 +207,7 @@ const GameContainer: React.FC = () => {
           </div>
         ) : (
           <div className="flex-1 h-full animate-in fade-in duration-1000 overflow-hidden">
-            <NarrativeEngine />
+            <NarrativeEngine key={currentLevel} />
           </div>
         )}
       </div>
@@ -163,9 +228,11 @@ const GameContainer: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <GameProvider>
-      <GameContainer />
-    </GameProvider>
+    <ErrorBoundary>
+      <GameProvider>
+        <GameContainer />
+      </GameProvider>
+    </ErrorBoundary>
   );
 };
 

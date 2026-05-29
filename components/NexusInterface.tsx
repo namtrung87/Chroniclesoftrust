@@ -2,6 +2,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { ArrowRight, Activity, Zap, ShieldCheck, HelpCircle, Lock, Loader2, Sparkles, Info, Scale } from 'lucide-react';
 import { useGame } from '../GameContext';
+import { playEthicalSound } from '../audioUtils';
 
 const NexusInterface: React.FC = () => {
   const { setCurrentLevel, addShard, updateBalance } = useGame();
@@ -28,10 +29,15 @@ const NexusInterface: React.FC = () => {
   const pillars = ["Fairness", "Privacy", "Transparency", "Ownership", "Accountability"];
 
   const isBalanced = useMemo(() => {
-    return weights.eco >= 30 && weights.eco <= 40 &&
+    const balanced = weights.eco >= 30 && weights.eco <= 40 &&
            weights.soc >= 30 && weights.soc <= 40 &&
            weights.env >= 30 && weights.env <= 40;
-  }, [weights]);
+    
+    if (balanced && !isLoading) {
+       // Optional: play subtle sound when balance is hit
+    }
+    return balanced;
+  }, [weights, isLoading]);
 
   const allMappingsCorrect = useMemo(() => {
     return problems.every(p => mappings[p.id] === p.correct);
@@ -42,10 +48,19 @@ const NexusInterface: React.FC = () => {
   };
 
   const handleMappingChange = (id: string, val: string) => {
+    const problem = problems.find(p => p.id === id);
+    if (val && problem) {
+      if (val === problem.correct) {
+        playEthicalSound('success');
+      } else {
+        playEthicalSound('error');
+      }
+    }
     setMappings(prev => ({ ...prev, [id]: val }));
   };
 
   const finishGame = () => {
+    playEthicalSound('transition');
     addShard("The Apex of Stewardship");
     updateBalance({ soc: 30, eco: 20, env: 20 });
     setCurrentLevel(6);
@@ -108,50 +123,77 @@ const NexusInterface: React.FC = () => {
 
       <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
       {phase === 'tuner' ? (
-        <div className="bg-slate-950/40 p-10 rounded-[2.5rem] border border-slate-800/50 space-y-12 animate-in slide-in-from-left-8 duration-700 shadow-2xl mt-4">
-          <div className="space-y-6">
-            <div className="flex justify-between text-[11px] mono text-emerald-500 font-black uppercase tracking-widest">
-              <span className="flex items-center gap-2"><Zap className="w-3.5 h-3.5" /> Economic Prosperity</span>
-              <span>{weights.eco}%</span>
+        <div className="p-12 rounded-[3.5rem] border border-white/5 space-y-16 animate-in zoom-in-95 duration-1000 shadow-[0_0_100px_rgba(0,0,0,0.5)] mt-6 glass-vibrant relative overflow-hidden">
+          {/* Decorative Prism Background Element */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-[100px] -mr-32 -mt-32" />
+          
+          <div className="space-y-8 relative z-10">
+            <div className="flex justify-between items-end">
+              <div className="space-y-1">
+                <div className="mono text-[10px] text-emerald-500 font-black uppercase tracking-[0.4em]">Resource_Sector_01</div>
+                <h4 className="text-xl font-bold text-white uppercase tracking-tight flex items-center gap-3">
+                  <Zap className="w-5 h-5 text-emerald-500" /> Economic Prosperity
+                </h4>
+              </div>
+              <span className="mono text-3xl text-emerald-400 font-black tabular-nums">{weights.eco}%</span>
             </div>
-            <input 
-              type="range" min="0" max="100" value={weights.eco} 
-              onChange={(e) => handleSliderChange('eco', parseInt(e.target.value))}
-              className="w-full h-3 bg-slate-900 rounded-full appearance-none cursor-pointer accent-emerald-500 transition-all hover:bg-slate-800"
-            />
+            <div className="relative group">
+              <input 
+                type="range" min="0" max="100" value={weights.eco} 
+                onChange={(e) => handleSliderChange('eco', parseInt(e.target.value))}
+                className="w-full h-4 bg-slate-900/50 rounded-full appearance-none cursor-pointer accent-emerald-500 hover:accent-emerald-400 transition-all border border-white/5"
+              />
+              <div className="absolute -inset-1 bg-emerald-500/10 blur opacity-0 group-hover:opacity-100 transition-opacity rounded-full pointer-events-none" />
+            </div>
           </div>
           
-          <div className="space-y-6">
-            <div className="flex justify-between text-[11px] mono text-blue-500 font-black uppercase tracking-widest">
-              <span className="flex items-center gap-2"><Activity className="w-3.5 h-3.5" /> Social Cohesion</span>
-              <span>{weights.soc}%</span>
+          <div className="space-y-8 relative z-10">
+            <div className="flex justify-between items-end">
+              <div className="space-y-1">
+                <div className="mono text-[10px] text-blue-500 font-black uppercase tracking-[0.4em]">Resource_Sector_02</div>
+                <h4 className="text-xl font-bold text-white uppercase tracking-tight flex items-center gap-3">
+                  <Activity className="w-5 h-5 text-blue-500" /> Social Cohesion
+                </h4>
+              </div>
+              <span className="mono text-3xl text-blue-400 font-black tabular-nums">{weights.soc}%</span>
             </div>
-            <input 
-              type="range" min="0" max="100" value={weights.soc} 
-              onChange={(e) => handleSliderChange('soc', parseInt(e.target.value))}
-              className="w-full h-3 bg-slate-900 rounded-full appearance-none cursor-pointer accent-blue-500 transition-all hover:bg-slate-800"
-            />
+            <div className="relative group">
+              <input 
+                type="range" min="0" max="100" value={weights.soc} 
+                onChange={(e) => handleSliderChange('soc', parseInt(e.target.value))}
+                className="w-full h-4 bg-slate-900/50 rounded-full appearance-none cursor-pointer accent-blue-500 hover:accent-blue-400 transition-all border border-white/5"
+              />
+              <div className="absolute -inset-1 bg-blue-500/10 blur opacity-0 group-hover:opacity-100 transition-opacity rounded-full pointer-events-none" />
+            </div>
           </div>
           
-          <div className="space-y-6">
-            <div className="flex justify-between text-[11px] mono text-teal-500 font-black uppercase tracking-widest">
-              <span className="flex items-center gap-2"><Sparkles className="w-3.5 h-3.5" /> Biosphere Integrity</span>
-              <span>{weights.env}%</span>
+          <div className="space-y-8 relative z-10">
+            <div className="flex justify-between items-end">
+              <div className="space-y-1">
+                <div className="mono text-[10px] text-teal-400 font-black uppercase tracking-[0.4em]">Resource_Sector_03</div>
+                <h4 className="text-xl font-bold text-white uppercase tracking-tight flex items-center gap-3">
+                  <Sparkles className="w-5 h-5 text-teal-400" /> Biosphere Integrity
+                </h4>
+              </div>
+              <span className="mono text-3xl text-teal-300 font-black tabular-nums">{weights.env}%</span>
             </div>
-            <input 
-              type="range" min="0" max="100" value={weights.env} 
-              onChange={(e) => handleSliderChange('env', parseInt(e.target.value))}
-              className="w-full h-3 bg-slate-900 rounded-full appearance-none cursor-pointer accent-teal-400 transition-all hover:bg-slate-800"
-            />
+            <div className="relative group">
+              <input 
+                type="range" min="0" max="100" value={weights.env} 
+                onChange={(e) => handleSliderChange('env', parseInt(e.target.value))}
+                className="w-full h-4 bg-slate-900/50 rounded-full appearance-none cursor-pointer accent-teal-400 hover:accent-teal-300 transition-all border border-white/5"
+              />
+              <div className="absolute -inset-1 bg-teal-400/10 blur opacity-0 group-hover:opacity-100 transition-opacity rounded-full pointer-events-none" />
+            </div>
           </div>
 
           <button 
             disabled={!isBalanced}
             onClick={() => setPhase('pillars')}
-            className={`w-full py-6 rounded-3xl font-black mono text-sm uppercase tracking-[0.4em] transition-all hover:scale-[1.01] active:scale-[0.98] mt-8
-              ${isBalanced ? 'bg-emerald-500 text-slate-950 shadow-2xl shadow-emerald-500/20' : 'bg-slate-900 text-slate-600 border border-slate-800 cursor-not-allowed'}`}
+            className={`w-full py-8 rounded-3xl font-black mono text-base uppercase tracking-[0.5em] transition-all hover:scale-[1.02] active:scale-[0.98] mt-12 flex items-center justify-center gap-4
+              ${isBalanced ? 'bg-emerald-500 text-slate-950 shadow-[0_20px_50px_rgba(16,185,129,0.35)]' : 'bg-white/5 text-slate-600 border border-white/5 cursor-not-allowed'}`}
           >
-            {isBalanced ? 'Commence_Ethics_Mapping' : 'Achieve_Balance_to_Proceed'} <ArrowRight className="w-5 h-5 ml-2" />
+            {isBalanced ? 'PROCEED_TO_ETHICAL_LOGIC' : 'BALANCING_REQUIRED'} <ArrowRight className={`w-7 h-7 ${isBalanced ? 'animate-bounce-x' : ''}`} />
           </button>
         </div>
       ) : (

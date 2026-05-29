@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldAlert, ArrowRight, TrendingUp, DollarSign, Users, Database, Search, CheckCircle, Loader2, ShieldCheck, AlertCircle, Terminal, Info } from 'lucide-react';
 import { useGame } from '../GameContext';
+import { playEthicalSound } from '../audioUtils';
 
 const CitadelDashboard: React.FC = () => {
   const { setCurrentLevel, addShard, updateBalance } = useGame();
@@ -24,6 +25,7 @@ const CitadelDashboard: React.FC = () => {
   const handleAlertClick = (id: string) => {
     if (!foundAlerts.includes(id)) {
       setFoundAlerts([...foundAlerts, id]);
+      playEthicalSound('success');
     }
     setShowPopup(id);
   };
@@ -31,6 +33,7 @@ const CitadelDashboard: React.FC = () => {
   const isComplete = foundAlerts.length === 3;
 
   const handleNext = () => {
+    playEthicalSound('transition');
     addShard("The Shield of the Whistleblower");
     updateBalance({ soc: 15, eco: 10 });
     setCurrentLevel(5);
@@ -86,57 +89,57 @@ const CitadelDashboard: React.FC = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1">
-        <div className={`bg-slate-950/60 p-10 rounded-[2.5rem] border transition-all duration-700 relative group overflow-hidden ${foundAlerts.includes('pressure') ? 'border-emerald-500/40 shadow-[0_0_40px_rgba(16,185,129,0.1)]' : 'border-slate-800 hover:border-emerald-500/30'}`}>
-          <div className="text-[10px] mono text-slate-500 mb-2 uppercase tracking-[0.3em] font-black">Market Confidence Index</div>
-          <div className="text-4xl mono font-bold text-emerald-400">92.4%</div>
-          <TrendingUp className="absolute bottom-6 right-6 w-24 h-24 text-emerald-500/5" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 flex-1">
+        <div className={`p-10 rounded-[2.5rem] border transition-all duration-700 relative group overflow-hidden glass-vibrant ${foundAlerts.includes('pressure') ? 'border-emerald-500/40 shadow-[0_0_60px_rgba(16,185,129,0.15)]' : 'border-white/5 hover:border-emerald-500/30'}`}>
+          <div className="text-[10px] mono text-emerald-500/60 mb-2 uppercase tracking-[0.4em] font-black group-hover:text-emerald-400 transition-colors">Market Confidence Index</div>
+          <div className="text-5xl mono font-black text-white group-hover:scale-105 transition-transform duration-500 origin-left">92.4%</div>
+          <TrendingUp className="absolute bottom-6 right-6 w-32 h-32 text-emerald-500/5 group-hover:text-emerald-500/10 transition-all duration-1000 rotate-12" />
           {!foundAlerts.includes('pressure') && (
             <button 
               onClick={() => handleAlertClick('pressure')}
-              className="absolute top-6 right-6 p-3 bg-amber-500/20 rounded-2xl hover:bg-amber-500/40 transition-all cursor-pointer animate-bounce border border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+              className="absolute top-8 right-8 p-4 bg-amber-500/20 rounded-2xl hover:bg-amber-500/40 transition-all cursor-pointer animate-bounce border border-amber-500/40 shadow-[0_0_30px_rgba(245,158,11,0.4)] group/btn"
               title="Anomaly Detected: Click to Scan"
             >
-              <ShieldAlert className="w-8 h-8 text-amber-500" />
+              <ShieldAlert className="w-10 h-10 text-amber-500 group-hover/btn:scale-110 transition-transform" />
             </button>
           )}
-          {foundAlerts.includes('pressure') && <div className="absolute top-6 right-6 mono text-[10px] font-black text-emerald-500 uppercase tracking-widest flex items-center gap-2 bg-emerald-500/10 px-4 py-2 rounded-xl border border-emerald-500/30"><CheckCircle className="w-4 h-4"/> PRESSURE_VERIFIED</div>}
+          {foundAlerts.includes('pressure') && <div className="absolute top-8 right-8 mono text-[11px] font-black text-emerald-500 uppercase tracking-widest flex items-center gap-2 bg-emerald-500/10 px-5 py-3 rounded-2xl border border-emerald-500/30 animate-in zoom-in-90"><CheckCircle className="w-5 h-5"/> PRESSURE_VERIFIED</div>}
         </div>
         
-        <div className={`bg-slate-950/60 p-10 rounded-[2.5rem] border transition-all duration-700 relative group overflow-hidden ${foundAlerts.includes('opportunity') ? 'border-blue-500/40 shadow-[0_0_40px_rgba(59,130,246,0.1)]' : 'border-slate-800 hover:border-blue-500/30'}`}>
-          <div className="text-[10px] mono text-slate-500 mb-2 uppercase tracking-[0.3em] font-black">System Log Integrity</div>
-          <div className="text-4xl mono font-bold text-blue-400">NOMINAL</div>
-          <ShieldCheck className="absolute bottom-6 right-6 w-24 h-24 text-blue-500/5" />
+        <div className={`p-10 rounded-[2.5rem] border transition-all duration-700 relative group overflow-hidden glass-vibrant ${foundAlerts.includes('opportunity') ? 'border-blue-500/40 shadow-[0_0_60px_rgba(59,130,246,0.15)]' : 'border-white/5 hover:border-blue-500/30'}`}>
+          <div className="text-[10px] mono text-blue-500/60 mb-2 uppercase tracking-[0.4em] font-black group-hover:text-blue-400 transition-colors">System Log Integrity</div>
+          <div className="text-5xl mono font-black text-white group-hover:scale-105 transition-transform duration-500 origin-left uppercase">Nominal</div>
+          <ShieldCheck className="absolute bottom-6 right-6 w-32 h-32 text-blue-500/5 group-hover:text-blue-500/10 transition-all duration-1000 -rotate-12" />
           {!foundAlerts.includes('opportunity') && (
             <button 
               onClick={() => handleAlertClick('opportunity')}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-3 bg-amber-500/20 rounded-2xl hover:bg-amber-500/40 transition-all cursor-pointer animate-pulse border border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-4 bg-amber-500/20 rounded-2xl hover:bg-amber-500/40 transition-all cursor-pointer animate-pulse border border-amber-500/40 shadow-[0_0_30px_rgba(245,158,11,0.4)] group/btn"
               title="Anomaly Detected: Click to Scan"
             >
-              <ShieldAlert className="w-8 h-8 text-amber-500" />
+              <ShieldAlert className="w-10 h-10 text-amber-500 group-hover/btn:scale-110 transition-transform" />
             </button>
           )}
-          {foundAlerts.includes('opportunity') && <div className="absolute top-6 right-6 mono text-[10px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-2 bg-blue-500/10 px-4 py-2 rounded-xl border border-blue-500/30"><CheckCircle className="w-4 h-4"/> OPPORTUNITY_VERIFIED</div>}
+          {foundAlerts.includes('opportunity') && <div className="absolute top-8 right-8 mono text-[11px] font-black text-blue-400 uppercase tracking-widest flex items-center gap-2 bg-blue-500/10 px-5 py-3 rounded-2xl border border-blue-500/30 animate-in zoom-in-90"><CheckCircle className="w-5 h-5"/> OPPORTUNITY_VERIFIED</div>}
         </div>
 
-        <div className={`bg-slate-950/60 p-10 rounded-[2.5rem] border transition-all duration-700 relative group overflow-hidden ${foundAlerts.includes('rationalization') ? 'border-purple-500/40 shadow-[0_0_40px_rgba(168,85,247,0.1)]' : 'border-slate-800 hover:border-purple-500/30'}`}>
-          <div className="text-[10px] mono text-slate-500 mb-2 uppercase tracking-[0.3em] font-black">Employee Trust Index</div>
-          <div className="text-4xl mono font-bold text-purple-400">STABLE</div>
-          <Users className="absolute bottom-6 right-6 w-24 h-24 text-purple-500/5" />
+        <div className={`p-10 rounded-[2.5rem] border transition-all duration-700 relative group overflow-hidden glass-vibrant ${foundAlerts.includes('rationalization') ? 'border-purple-500/40 shadow-[0_0_60px_rgba(168,85,247,0.15)]' : 'border-white/5 hover:border-purple-500/30'}`}>
+          <div className="text-[10px] mono text-purple-500/60 mb-2 uppercase tracking-[0.4em] font-black group-hover:text-purple-400 transition-colors">Employee Trust Index</div>
+          <div className="text-5xl mono font-black text-white group-hover:scale-105 transition-transform duration-500 origin-left uppercase">Stable</div>
+          <Users className="absolute bottom-6 right-6 w-32 h-32 text-purple-500/5 group-hover:text-purple-500/10 transition-all duration-1000 rotate-6" />
           {!foundAlerts.includes('rationalization') && (
             <button 
               onClick={() => handleAlertClick('rationalization')}
-              className="absolute bottom-6 left-1/2 -translate-x-1/2 p-3 bg-amber-500/20 rounded-2xl hover:bg-amber-500/40 transition-all cursor-pointer animate-bounce border border-amber-500/40 shadow-[0_0_20px_rgba(245,158,11,0.3)]"
+              className="absolute bottom-10 left-1/2 -translate-x-1/2 p-4 bg-amber-500/20 rounded-2xl hover:bg-amber-500/40 transition-all cursor-pointer animate-bounce border border-amber-500/40 shadow-[0_0_30px_rgba(245,158,11,0.4)] group/btn"
               title="Anomaly Detected: Click to Scan"
             >
-              <ShieldAlert className="w-8 h-8 text-amber-500" />
+              <ShieldAlert className="w-10 h-10 text-amber-500 group-hover/btn:scale-110 transition-transform" />
             </button>
           )}
-          {foundAlerts.includes('rationalization') && <div className="absolute top-6 right-6 mono text-[10px] font-black text-purple-400 uppercase tracking-widest flex items-center gap-2 bg-purple-500/10 px-4 py-2 rounded-xl border border-purple-500/30"><CheckCircle className="w-4 h-4"/> RATIONALIZATION_VERIFIED</div>}
+          {foundAlerts.includes('rationalization') && <div className="absolute top-8 right-8 mono text-[11px] font-black text-purple-400 uppercase tracking-widest flex items-center gap-2 bg-purple-500/10 px-5 py-3 rounded-2xl border border-purple-500/30 animate-in zoom-in-90"><CheckCircle className="w-5 h-5"/> RATIONALIZATION_VERIFIED</div>}
         </div>
       </div>
 
-      <div className="bg-slate-950/80 rounded-[3rem] border border-slate-800 p-12 h-64 flex flex-col items-center justify-center relative overflow-hidden shadow-inner">
+      <div className="rounded-[4rem] border border-white/5 p-16 h-80 flex flex-col items-center justify-center relative overflow-hidden glass-vibrant">
         <div className="absolute inset-0 grid-bg opacity-10" />
         <svg width="100%" height="100%" viewBox="0 0 400 100" className="opacity-20 relative z-10">
           <path d="M0,80 L40,75 L80,85 L120,40 L160,50 L200,10 L240,20 L280,45 L320,35 L360,55 L400,30" fill="none" stroke="#10b981" strokeWidth="2" />
